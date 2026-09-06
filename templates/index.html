@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Movie Match</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #182026;
+      --muted: #657277;
+      --paper: #f4f1ea;
+      --panel: #fffdf8;
+      --mint: #b8ddcf;
+      --coral: #ec735c;
+      --line: #d8d4c9;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: "Space Grotesk", sans-serif;
+    }
+    .shell { max-width: 1120px; margin: 0 auto; padding: 28px 24px 64px; }
+    header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 18px; }
+    .mark { font-family: "DM Mono", monospace; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
+    .status { color: var(--muted); font-size: 13px; }
+    .hero { display: grid; grid-template-columns: 1.2fr .8fr; gap: 48px; align-items: end; padding: 86px 0 62px; }
+    h1 { max-width: 700px; margin: 0; font-size: clamp(3rem, 8vw, 7.8rem); line-height: .88; letter-spacing: -.07em; font-weight: 600; }
+    .intro { max-width: 330px; margin: 0 0 8px; color: var(--muted); font-size: 17px; line-height: 1.5; }
+    .search { display: grid; grid-template-columns: 1fr 120px auto; gap: 10px; padding: 10px; background: var(--panel); border: 1px solid var(--line); box-shadow: 8px 8px 0 var(--mint); }
+    input, select, button { border: 0; min-height: 52px; padding: 0 16px; font: inherit; }
+    input, select { color: var(--ink); background: #f1eee6; outline: 2px solid transparent; }
+    input:focus, select:focus { outline-color: var(--coral); }
+    button { color: #fff; background: var(--ink); cursor: pointer; font-weight: 600; transition: background .2s, transform .2s; }
+    button:hover { background: var(--coral); transform: translateY(-2px); }
+    button:disabled { opacity: .65; cursor: wait; transform: none; }
+    .results-head { display: flex; justify-content: space-between; align-items: baseline; margin: 86px 0 20px; }
+    h2 { margin: 0; font-size: 28px; letter-spacing: -.04em; }
+    #message { color: var(--muted); font-size: 14px; }
+    .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+    .card { min-width: 0; background: var(--panel); border: 1px solid var(--line); padding: 10px; animation: appear .35s ease both; }
+    .card img { display: block; width: 100%; aspect-ratio: 2 / 3; object-fit: cover; background: var(--mint); }
+    .card h3 { margin: 13px 2px 4px; font-size: 16px; line-height: 1.2; }
+    .number { color: var(--coral); font: 12px "DM Mono", monospace; }
+    footer { margin-top: 72px; color: var(--muted); font: 12px "DM Mono", monospace; }
+    @keyframes appear { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+    @media (max-width: 760px) {
+      .shell { padding: 20px 16px 48px; }
+      .hero { display: block; padding: 64px 0 42px; }
+      .intro { margin-top: 28px; }
+      .search { grid-template-columns: 1fr 92px; }
+      .search button { grid-column: 1 / -1; }
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .results-head { margin-top: 64px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header><div class="mark">Movie Match / 01</div><div class="status">content-based recommendations</div></header>
+    <section class="hero">
+      <h1>Find your<br>next frame.</h1>
+      <p class="intro">Choose a film you already love. The recommendation engine will look through genre, cast, keywords, and director to find the closest matches.</p>
+    </section>
+    <form class="search" id="search-form">
+      <input id="movie" name="movie" list="movie-list" placeholder="Try Avatar, Inception, The Matrix..." required autocomplete="off">
+      <select id="limit" aria-label="Number of recommendations">
+        <option value="5">5 films</option>
+        <option value="8">8 films</option>
+        <option value="10">10 films</option>
+      </select>
+      <button id="submit" type="submit">Recommend</button>
+    </form>
+    <datalist id="movie-list">
+      {% for movie in movies %}<option value="{{ movie }}">{% endfor %}
+    </datalist>
+    <section class="results-head"><h2>Recommended for you</h2><span id="message">Start with a favorite.</span></section>
+    <section class="grid" id="results" aria-live="polite"></section>
+    <footer>Built with cosine similarity / Project by N K L N MURTHY</footer>
+  </main>
+  <script>
+    const form = document.getElementById('search-form');
+    const input = document.getElementById('movie');
+    const limit = document.getElementById('limit');
+    const submit = document.getElementById('submit');
+    const results = document.getElementById('results');
+    const message = document.getElementById('message');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      submit.disabled = true;
+      message.textContent = 'Searching the catalogue...';
+      results.replaceChildren();
+      try {
+        const response = await fetch(`/api/recommendations?title=${encodeURIComponent(input.value)}&limit=${limit.value}`);
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Unable to find recommendations.');
+        data.forEach((movie, index) => {
+          const card = document.createElement('article');
+          card.className = 'card';
+          card.style.animationDelay = `${index * 45}ms`;
+          card.innerHTML = `<img src="${movie.poster}" alt="Poster for ${movie.title}" loading="lazy"><div class="number">0${index + 1}</div><h3></h3>`;
+          card.querySelector('h3').textContent = movie.title;
+          results.appendChild(card);
+        });
+        message.textContent = `${data.length} close matches for ${input.value.trim()}.`;
+      } catch (error) {
+        message.textContent = error.message;
+      } finally {
+        submit.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
