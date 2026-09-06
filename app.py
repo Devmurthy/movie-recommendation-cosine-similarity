@@ -75,7 +75,14 @@ def recommend_movies(movie_title, num_recommendations=5):
             except:
                 year = None
         poster_url = fetch_poster_omdb(title, year)
-        recommended.append((title, poster_url))
+        genres = str(movies.iloc[i].get('genres', '')).replace(' ', ' / ')
+        recommended.append({
+            'title': title,
+            'poster': poster_url,
+            'year': year,
+            'genres': genres,
+            'score': round(float(score) * 100),
+        })
     return recommended
 
 @app.get('/')
@@ -101,7 +108,7 @@ def recommendations():
     results = recommend_movies(title, limit)
     if not results:
         return jsonify({'error': 'Movie not found.'}), 404
-    return jsonify([{'title': title, 'poster': poster} for title, poster in results])
+    return jsonify(results)
 
 
 if __name__ == '__main__':

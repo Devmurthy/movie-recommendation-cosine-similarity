@@ -3,90 +3,123 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Reelwise — Find your next film</title>
+  <title>Reelwise | Movie recommendations</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --night: #0c1218;
-      --panel: #141d25;
-      --panel-light: #1d2a33;
-      --text: #f2eee6;
-      --muted: #96a2a7;
-      --lime: #d6e85b;
-      --orange: #ff765f;
-      --line: #2b3941;
+      --black: #07090d;
+      --surface: #11151d;
+      --surface-2: #1a202b;
+      --white: #f5f7fa;
+      --muted: #a2a9b7;
+      --red: #e50914;
+      --gold: #f5c451;
+      --line: rgba(255,255,255,.11);
     }
     * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      color: var(--text);
-      background: var(--night);
-      font-family: "Space Grotesk", sans-serif;
-    }
-    .shell { max-width: 1240px; margin: 0 auto; padding: 24px 28px 72px; }
-    header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 20px; }
-    .mark { color: var(--lime); font-family: "DM Mono", monospace; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
-    .status { color: var(--muted); font-size: 13px; }
-    .hero { display: grid; grid-template-columns: 1fr 340px; gap: 48px; align-items: end; padding: 96px 0 52px; }
-    .eyebrow { color: var(--orange); font: 12px "DM Mono", monospace; letter-spacing: .12em; text-transform: uppercase; }
-    h1 { max-width: 760px; margin: 14px 0 0; font-size: clamp(3.6rem, 9vw, 8.5rem); line-height: .84; letter-spacing: -.075em; font-weight: 600; }
-    .intro { max-width: 330px; margin: 0 0 8px; color: var(--muted); font-size: 16px; line-height: 1.55; }
-    .search { display: grid; grid-template-columns: 1fr 124px auto; gap: 8px; padding: 8px; background: var(--panel); border: 1px solid var(--line); box-shadow: 10px 10px 0 var(--lime); }
-    input, select, button { border: 0; min-height: 52px; padding: 0 16px; font: inherit; }
-    input, select { color: var(--text); background: var(--panel-light); outline: 2px solid transparent; }
-    input::placeholder { color: #75838a; }
-    input:focus, select:focus { outline-color: var(--lime); }
-    button { color: var(--night); background: var(--lime); cursor: pointer; font-weight: 700; transition: background .2s, transform .2s; }
-    button:hover { background: var(--orange); transform: translateY(-2px); }
-    button:disabled { opacity: .65; cursor: wait; transform: none; }
-    .results-head { display: flex; justify-content: space-between; align-items: baseline; margin: 86px 0 24px; }
-    h2 { margin: 0; font-size: 32px; letter-spacing: -.05em; }
-    #message { color: var(--muted); font-size: 14px; }
-    .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px; }
-    .card { min-width: 0; overflow: hidden; background: var(--panel); border: 1px solid var(--line); padding: 9px; animation: appear .35s ease both; }
-    .poster-wrap { position: relative; overflow: hidden; background: var(--panel-light); }
-    .card img { display: block; width: 100%; aspect-ratio: 2 / 3; object-fit: cover; transition: transform .35s ease; }
-    .card:hover img { transform: scale(1.04); }
-    .card h3 { margin: 13px 2px 5px; font-size: 16px; line-height: 1.2; }
-    .number { color: var(--lime); font: 12px "DM Mono", monospace; }
-    footer { margin-top: 72px; color: var(--muted); font: 12px "DM Mono", monospace; }
-    @keyframes appear { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
-    @media (max-width: 760px) {
-      .shell { padding: 20px 16px 48px; }
-      .hero { display: block; padding: 64px 0 42px; }
-      .intro { margin-top: 28px; }
-      .search { grid-template-columns: 1fr 92px; }
-      .search button { grid-column: 1 / -1; }
-      .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .results-head { margin-top: 64px; }
-      .shell { padding: 20px 16px 48px; }
+    html { background: var(--black); }
+    body { margin: 0; color: var(--white); background: var(--black); font-family: "DM Sans", sans-serif; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    .topbar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 34px; height: 72px; padding: 0 5vw; background: linear-gradient(180deg, rgba(7,9,13,.98), rgba(7,9,13,.8)); backdrop-filter: blur(14px); }
+    .brand { color: var(--red); font: 800 26px Manrope, sans-serif; letter-spacing: -.08em; }
+    .nav { display: flex; gap: 22px; color: var(--muted); font-size: 14px; }
+    .nav strong { color: var(--white); }
+    .account { margin-left: auto; display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 13px; }
+    .avatar { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; color: var(--black); background: var(--gold); font-weight: 700; }
+    .hero { position: relative; min-height: 590px; display: flex; align-items: end; overflow: hidden; padding: 0 5vw 72px; background: radial-gradient(circle at 73% 30%, rgba(229,9,20,.2), transparent 27%), linear-gradient(90deg, var(--black) 12%, rgba(7,9,13,.92) 38%, rgba(7,9,13,.25) 78%, var(--black)), linear-gradient(0deg, var(--black), transparent 45%); }
+    .hero::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(135deg, #251116 0%, #111824 48%, #251f19 100%); opacity: .8; }
+    .hero-art { position: absolute; z-index: -1; right: 5vw; bottom: 0; width: 40%; max-width: 520px; height: 94%; opacity: .7; mask-image: linear-gradient(90deg, transparent, black 28%, black 80%, transparent); }
+    .hero-art img { width: 100%; height: 100%; object-fit: cover; object-position: center; mix-blend-mode: screen; opacity: .55; }
+    .hero-content { max-width: 620px; }
+    .kicker { color: var(--gold); font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+    h1 { margin: 14px 0 16px; font: 800 clamp(42px, 6vw, 84px)/.92 Manrope, sans-serif; letter-spacing: -.07em; }
+    .hero-copy { max-width: 480px; margin: 0; color: #d1d5dc; font-size: 17px; line-height: 1.55; }
+    .hero-meta { display: flex; gap: 15px; margin-top: 22px; color: var(--muted); font-size: 14px; }
+    .hero-meta .match { color: #54d68a; font-weight: 700; }
+    .actions { display: flex; gap: 10px; margin-top: 28px; }
+    .play, .quiet { border: 0; border-radius: 4px; padding: 12px 22px; font-weight: 700; }
+    .play { color: var(--black); background: var(--white); }
+    .quiet { color: var(--white); background: rgba(255,255,255,.16); }
+    .content { max-width: 1440px; margin: 0 auto; padding: 0 5vw 72px; }
+    .search-bar { position: relative; z-index: 2; display: grid; grid-template-columns: 1fr 150px auto; gap: 8px; max-width: 840px; margin: -26px 0 48px; padding: 8px; border: 1px solid var(--line); border-radius: 6px; background: rgba(17,21,29,.95); box-shadow: 0 18px 45px rgba(0,0,0,.3); }
+    input, select { min-height: 50px; border: 1px solid transparent; border-radius: 4px; outline: 0; color: var(--white); background: var(--surface-2); padding: 0 15px; }
+    input::placeholder { color: #737b89; }
+    input:focus, select:focus { border-color: var(--red); }
+    .search-bar button { min-height: 50px; border: 0; border-radius: 4px; color: white; background: var(--red); font-weight: 700; }
+    .search-bar button:hover { background: #f31b25; }
+    .row-heading { display: flex; align-items: baseline; justify-content: space-between; margin: 30px 0 16px; }
+    h2 { margin: 0; font: 700 22px Manrope, sans-serif; letter-spacing: -.04em; }
+    .message { color: var(--muted); font-size: 13px; }
+    .rail { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(170px, 1fr); gap: 15px; overflow-x: auto; padding: 4px 0 12px; scrollbar-width: thin; scrollbar-color: var(--red) transparent; }
+    .card { position: relative; min-width: 0; overflow: hidden; border-radius: 5px; background: var(--surface); transition: transform .25s ease, box-shadow .25s ease; animation: rise .4s ease both; }
+    .card:hover { z-index: 1; transform: translateY(-7px) scale(1.025); box-shadow: 0 18px 34px rgba(0,0,0,.45); }
+    .poster { position: relative; aspect-ratio: 2 / 3; overflow: hidden; background: var(--surface-2); }
+    .poster img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .3s ease; }
+    .card:hover .poster img { transform: scale(1.06); }
+    .rank { position: absolute; top: 9px; left: 9px; display: grid; place-items: center; width: 29px; height: 29px; border-radius: 4px; color: var(--black); background: var(--gold); font-weight: 700; font-size: 13px; }
+    .card-info { padding: 12px 12px 14px; }
+    .card-title { margin: 0 0 6px; overflow: hidden; font-weight: 700; font-size: 14px; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
+    .card-meta { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .featured { display: grid; grid-template-columns: 150px 1fr; gap: 24px; align-items: center; max-width: 760px; padding: 20px; border: 1px solid var(--line); border-radius: 6px; background: linear-gradient(120deg, var(--surface), #16121a); }
+    .featured-poster { aspect-ratio: 2 / 3; overflow: hidden; border-radius: 4px; }
+    .featured-poster img { width: 100%; height: 100%; object-fit: cover; }
+    .featured h3 { margin: 8px 0; font: 700 27px Manrope, sans-serif; }
+    .featured p { margin: 0; color: var(--muted); line-height: 1.5; }
+    .empty { padding: 42px 0; color: var(--muted); }
+    footer { margin-top: 70px; color: #687180; font-size: 12px; }
+    @keyframes rise { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: none; } }
+    @media (max-width: 720px) {
+      .topbar { gap: 18px; padding: 0 18px; }
+      .nav { display: none; }
+      .account { font-size: 0; }
+      .hero { min-height: 545px; padding: 0 18px 48px; }
+      .hero-art { right: -20%; width: 80%; opacity: .45; }
+      .hero-copy { font-size: 15px; }
+      .content { padding: 0 18px 48px; }
+      .search-bar { grid-template-columns: 1fr 92px; margin-top: -18px; }
+      .search-bar button { grid-column: 1 / -1; }
+      .rail { grid-auto-columns: 145px; }
+      .featured { grid-template-columns: 96px 1fr; gap: 15px; padding: 14px; }
+      .featured h3 { font-size: 20px; }
+      .featured p { font-size: 13px; }
     }
   </style>
 </head>
 <body>
-  <main class="shell">
-    <header><div class="mark">Reelwise / 01</div><div class="status">{{ poster_status }}</div></header>
-    <section class="hero">
-      <div><div class="eyebrow">Your next watch, calculated</div><h1>Find your<br>next frame.</h1></div>
-      <p class="intro">Choose a film you already love. Reelwise reads genre, cast, keywords, and director to find the closest matches.</p>
-    </section>
-    <form class="search" id="search-form">
-      <input id="movie" name="movie" list="movie-list" placeholder="Try Avatar, Inception, The Matrix..." required autocomplete="off">
-      <select id="limit" aria-label="Number of recommendations">
-        <option value="5">5 films</option>
-        <option value="8">8 films</option>
-        <option value="10">10 films</option>
-      </select>
-      <button id="submit" type="submit">Recommend</button>
+  <nav class="topbar">
+    <div class="brand">REELWISE</div>
+    <div class="nav"><strong>Home</strong><span>Movies</span><span>My List</span></div>
+    <div class="account"><span>{{ poster_status }}</span><span class="avatar">R</span></div>
+  </nav>
+  <section class="hero">
+    <div class="hero-art"><img id="hero-image" src="/static/poster-placeholder.svg" alt="Featured movie poster"></div>
+    <div class="hero-content">
+      <div class="kicker">Cosine-powered cinema guide</div>
+      <h1>Something great<br>to watch next.</h1>
+      <p class="hero-copy">Tell us one film you love. We will find your next watch from a catalogue of stories, casts, genres, and directors.</p>
+      <div class="hero-meta"><span class="match">98% for movie people</span><span>4.8K titles</span><span>HD</span></div>
+      <div class="actions"><button class="play" type="button" onclick="document.getElementById('movie').focus()">Start exploring</button><button class="quiet" type="button" onclick="document.getElementById('results').scrollIntoView({behavior:'smooth'})">More info</button></div>
+    </div>
+  </section>
+  <main class="content">
+    <form class="search-bar" id="search-form">
+      <input id="movie" list="movie-list" placeholder="Search a movie you love..." required autocomplete="off">
+      <select id="limit" aria-label="Number of recommendations"><option value="5">5 results</option><option value="8">8 results</option><option value="10">10 results</option></select>
+      <button id="submit" type="submit">Find matches</button>
     </form>
-    <datalist id="movie-list">
-      {% for movie in movies %}<option value="{{ movie }}">{% endfor %}
-    </datalist>
-    <section class="results-head"><h2>Recommended for you</h2><span id="message">Start with a favorite.</span></section>
-    <section class="grid" id="results" aria-live="polite"></section>
-    <footer>Built with cosine similarity / Project by N K L N MURTHY</footer>
+    <datalist id="movie-list">{% for movie in movies %}<option value="{{ movie }}">{% endfor %}</datalist>
+    <section id="featured-section" hidden>
+      <div class="row-heading"><h2>Top match</h2></div>
+      <article class="featured"><div class="featured-poster"><img id="featured-image" src="/static/poster-placeholder.svg" alt="Top recommendation poster"></div><div><div class="kicker">Your watchlist, upgraded</div><h3 id="featured-title"></h3><p id="featured-copy"></p></div></article>
+    </section>
+    <section>
+      <div class="row-heading"><h2>Because you watched it</h2><span id="message" class="message">Choose a film to begin</span></div>
+      <div class="rail" id="results"><div class="empty">Your recommendations will appear here.</div></div>
+    </section>
+    <footer>Reelwise / content-based recommendations / Project by N K L N MURTHY</footer>
   </main>
   <script>
     const form = document.getElementById('search-form');
@@ -95,26 +128,63 @@
     const submit = document.getElementById('submit');
     const results = document.getElementById('results');
     const message = document.getElementById('message');
+    const featuredSection = document.getElementById('featured-section');
+    const featuredImage = document.getElementById('featured-image');
+    const featuredTitle = document.getElementById('featured-title');
+    const featuredCopy = document.getElementById('featured-copy');
+    const fallback = '/static/poster-placeholder.svg';
+
+    function safeImage(image, url) {
+      image.src = url || fallback;
+      image.onerror = () => { image.onerror = null; image.src = fallback; };
+    }
+
+    function movieCard(movie, index) {
+      const card = document.createElement('article');
+      card.className = 'card';
+      card.style.animationDelay = `${index * 45}ms`;
+      const poster = document.createElement('div');
+      poster.className = 'poster';
+      const image = document.createElement('img');
+      image.alt = `Poster for ${movie.title}`;
+      image.loading = 'lazy';
+      safeImage(image, movie.poster);
+      poster.appendChild(image);
+      const rank = document.createElement('span');
+      rank.className = 'rank';
+      rank.textContent = String(index + 1).padStart(2, '0');
+      poster.appendChild(rank);
+      const info = document.createElement('div');
+      info.className = 'card-info';
+      const title = document.createElement('p');
+      title.className = 'card-title';
+      title.textContent = movie.title;
+      const meta = document.createElement('div');
+      meta.className = 'card-meta';
+      meta.textContent = [movie.year || 'Film', movie.genres || 'Recommended'].join('  •  ');
+      info.append(title, meta);
+      card.append(poster, info);
+      return card;
+    }
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       submit.disabled = true;
-      message.textContent = 'Searching the catalogue...';
+      message.textContent = 'Curating your row...';
       results.replaceChildren();
       try {
         const response = await fetch(`/api/recommendations?title=${encodeURIComponent(input.value)}&limit=${limit.value}`);
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Unable to find recommendations.');
-        data.forEach((movie, index) => {
-          const card = document.createElement('article');
-          card.className = 'card';
-          card.style.animationDelay = `${index * 45}ms`;
-          card.innerHTML = `<div class="poster-wrap"><img src="${movie.poster}" alt="Poster for ${movie.title}" loading="lazy" onerror="this.onerror=null;this.src='/static/poster-placeholder.svg';"></div><div class="number">0${index + 1}</div><h3></h3>`;
-          card.querySelector('h3').textContent = movie.title;
-          results.appendChild(card);
-        });
-        message.textContent = `${data.length} close matches for ${input.value.trim()}.`;
+        if (!response.ok) throw new Error(data.error || 'No matches found.');
+        const top = data[0];
+        safeImage(featuredImage, top.poster);
+        featuredTitle.textContent = top.title;
+        featuredCopy.textContent = `${top.year || 'A great film'} · ${top.genres || 'Curated from your favourite movie'} · ${top.score}% similarity match. Your next story starts here.`;
+        featuredSection.hidden = false;
+        data.forEach((movie, index) => results.appendChild(movieCard(movie, index)));
+        message.textContent = `${data.length} titles selected for you`;
       } catch (error) {
+        results.innerHTML = '<div class="empty">No movie found. Pick a title from the search suggestions and try again.</div>';
         message.textContent = error.message;
       } finally {
         submit.disabled = false;
