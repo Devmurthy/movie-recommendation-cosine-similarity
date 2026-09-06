@@ -87,13 +87,13 @@ def recommend_movies(movie_title, num_recommendations=5):
 
 @app.get('/')
 def home():
-    poster_status = 'OMDb posters connected' if OMDB_API_KEY else 'Add OMDB_API_KEY for posters'
+    poster_status = 'OMDb key configured' if OMDB_API_KEY else 'Add OMDB_API_KEY for posters'
     return render_template('index.html', movies=movies['title'].tolist(), poster_status=poster_status)
 
 
 @app.get('/health')
 def health():
-    return jsonify({'status': 'ok', 'poster_provider': 'omdb' if OMDB_API_KEY else 'fallback'})
+    return jsonify({'status': 'ok', 'poster_provider': 'omdb-configured' if OMDB_API_KEY else 'fallback'})
 
 
 @app.get('/api/recommendations')
