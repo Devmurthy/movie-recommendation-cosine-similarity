@@ -3,7 +3,7 @@ import pandas as pd
 import requests
 from functools import lru_cache
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.metrics.pairwise import linear_kernel
+from sklearn.metrics.pairwise import cosine_similarity
 import os
 from dotenv import load_dotenv
 
@@ -61,7 +61,7 @@ def recommend_movies(movie_title, num_recommendations=5):
     idx = get_movie_index(movie_title)
     if idx is None:
         return []
-    similarities = linear_kernel(count_matrix[idx], count_matrix).flatten()
+    similarities = cosine_similarity(count_matrix[idx], count_matrix).flatten()
     sim_scores = list(enumerate(similarities))
     sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)[1:num_recommendations+1]
     recommended = []
