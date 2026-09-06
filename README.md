@@ -1,8 +1,8 @@
 # Movie Recommendation System (Cosine Similarity)
 
-[![Streamlit App](https://img.shields.io/badge/Streamlit-Live%20Demo-brightgreen?logo=streamlit)](https://devmurthy-movie-recommendation-cosine-similarity-app-xuqzvc.streamlit.app)
+[![Live Demo](https://img.shields.io/badge/Render-Live%20Demo-brightgreen?logo=render)](https://movie-recommendation-cosine-similarity-2.onrender.com)
 
-**Live Demo:** [Click here to try the app!](https://devmurthy-movie-recommendation-cosine-similarity-app-xuqzvc.streamlit.app)
+**Live Demo:** [Click here to try the app!](https://movie-recommendation-cosine-similarity-2.onrender.com)
 
 ---
 
