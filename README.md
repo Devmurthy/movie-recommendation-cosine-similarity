@@ -35,7 +35,7 @@ Create a Render **Web Service** connected to this repository with:
 
 - **Build Command:** `python -m pip install -r requirements.txt`
 - **Start Command:** `python -m gunicorn --bind 0.0.0.0:$PORT app:app`
-- **Environment Variable:** `OMDB_API_KEY` (optional, for movie posters)
+- **Environment Variable:** `OMDB_API_KEY` (required for live movie posters)
 
 The service exposes `/health` for a health check. On Render's free tier, services can still spin down after inactivity; use a paid instance if the site must remain continuously warm.
 

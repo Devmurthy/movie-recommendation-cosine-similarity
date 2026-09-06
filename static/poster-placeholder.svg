@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Poster unavailable</title>
+  <desc id="desc">A film strip graphic indicating that a poster could not be loaded.</desc>
+  <rect width="600" height="900" fill="#1d2a33"/>
+  <path d="M145 170h310v560H145z" fill="none" stroke="#d6e85b" stroke-width="10"/>
+  <path d="M145 260h310M145 640h310" stroke="#d6e85b" stroke-width="10"/>
+  <circle cx="220" cy="215" r="20" fill="#ff765f"/><circle cx="380" cy="215" r="20" fill="#ff765f"/>
+  <circle cx="220" cy="685" r="20" fill="#ff765f"/><circle cx="380" cy="685" r="20" fill="#ff765f"/>
+  <text x="300" y="465" fill="#f2eee6" font-family="monospace" font-size="30" text-anchor="middle" letter-spacing="3">POSTER</text>
+  <text x="300" y="505" fill="#96a2a7" font-family="monospace" font-size="22" text-anchor="middle">UNAVAILABLE</text>
+</svg>

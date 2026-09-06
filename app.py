@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, render_template, request
 import pandas as pd
 import requests
+from functools import lru_cache
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 import os
@@ -10,6 +11,7 @@ load_dotenv()
 OMDB_API_KEY = os.getenv('OMDB_API_KEY')
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 app = Flask(__name__)
+POSTER_FALLBACK = '/static/poster-placeholder.svg'
 
 def load_data():
     df = pd.read_csv(os.path.join(BASE_DIR, 'movies.csv'))
@@ -34,25 +36,26 @@ def get_movie_index(title):
         return result.index[0]
     return None
 
+@lru_cache(maxsize=2048)
 def fetch_poster_omdb(title, year=None):
-    """
-    Fetch poster URL from OMDb API using movie title (and optionally year).
-    """
     if not OMDB_API_KEY:
-        return "https://via.placeholder.com/300x450?text=No+Poster"
+        return POSTER_FALLBACK
     params = {
         't': title,
         'apikey': OMDB_API_KEY
     }
     if year:
         params['y'] = str(year)
-    response = requests.get('http://www.omdbapi.com/', params=params, timeout=5)
-    if response.status_code == 200:
+    try:
+        response = requests.get('https://www.omdbapi.com/', params=params, timeout=4)
+        response.raise_for_status()
         data = response.json()
         poster_url = data.get('Poster')
-        if poster_url and poster_url != "N/A":
-            return poster_url
-    return "https://via.placeholder.com/300x450?text=No+Poster"
+        if data.get('Response') == 'True' and poster_url and poster_url != 'N/A':
+            return poster_url.replace('http://', 'https://', 1)
+    except (requests.RequestException, ValueError):
+        pass
+    return POSTER_FALLBACK
 
 def recommend_movies(movie_title, num_recommendations=5):
     idx = get_movie_index(movie_title)
@@ -77,12 +80,13 @@ def recommend_movies(movie_title, num_recommendations=5):
 
 @app.get('/')
 def home():
-    return render_template('index.html', movies=movies['title'].tolist())
+    poster_status = 'OMDb posters connected' if OMDB_API_KEY else 'Add OMDB_API_KEY for posters'
+    return render_template('index.html', movies=movies['title'].tolist(), poster_status=poster_status)
 
 
 @app.get('/health')
 def health():
-    return jsonify({'status': 'ok'})
+    return jsonify({'status': 'ok', 'poster_provider': 'omdb' if OMDB_API_KEY else 'fallback'})
 
 
 @app.get('/api/recommendations')
